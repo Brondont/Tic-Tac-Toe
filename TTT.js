@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
         [0, 4, 8],
         [2, 4, 6]
     ]
+    let drawc = 0;
     let currentplayer = "X";
     let Xwins = 0;
     let Owins = 0;
@@ -23,41 +24,35 @@ document.addEventListener("DOMContentLoaded", function () {
     let gamestatus = false;
     game();
     function game() {
-        //box clicked
-        boxes.forEach(box => box.addEventListener('click', function () {
-            if (!gamestatus && status.innerHTML != (currentplayer + "won!"))
-                box.innerHTML = currentplayer;
-            playerwon();
-            if (gamestatus) {
-                if (currentplayer == "X" && status.innerHTML != "X won!") {
-                    Xwins++;
-                }
-                else if (currentplayer == "O" && status.innerHTML != "O won!") {
-                    Owins++;
-                }
-                status.innerHTML = currentplayer + ' won!';
-                Xscore.innerHTML = "X score: " + Xwins;
-                Oscore.innerHTML = "O score: " + Owins;
-                return;
-            }
-            currentplayer = currentplayer == "X" ? "O" : "X";
-            status.innerHTML = currentplayer + "'s turn";
-        }));
-        //reset game
+        boxes.forEach(box => box.addEventListener('click', boxclicked));
+        //restart game
         restart.addEventListener('click', function () {
             boxes.forEach(box => box.innerHTML = "");
             gamestatus = false;
             currentplayer = "X";
             status.innerHTML = currentplayer + "'s turn";
+            drawc = 0;
         })
+        //restart score
         srestart.addEventListener('click', function () {
             Xscore.innerHTML = "X score: 0";
             Oscore.innerHTML = "O score: 0";
             Xwins = Owins = 0;
         })
     }
-    //check if the player won
-    function playerwon() {
+    function boxclicked() {
+        if (gamestatus)
+            return;
+        let tile = this;
+        if (tile.innerHTML != '')
+            return;
+        drawc++;
+        tile.innerHTML = currentplayer;
+        gamecondition();
+        checkwin();
+        currentplayer = currentplayer == "X" ? "O" : "X";
+    }
+    function gamecondition() {
         for (let condition of winCondition) {
             let [a, b, c] = condition;
             if (boxes[a].innerHTML == '' || boxes[b].innerHTML == '' || boxes[c].innerHTML == '') {
@@ -69,5 +64,23 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     }
-
+    function checkwin() {
+        if(drawc == 9 && !gamestatus){
+            status.innerHTML = "draw!";
+            return;
+        }
+        if (!gamestatus)
+            return;
+        else if (gamestatus == true) {
+            if (currentplayer == "X" && status.innerHTML != "X won!") {
+                Xwins++;
+            }
+            else if (currentplayer == "O" && status.innerHTML != "O won!") {
+                Owins++;
+            }
+            status.innerHTML = currentplayer + ' won!';
+            Xscore.innerHTML = "X score: " + Xwins;
+            Oscore.innerHTML = "O score: " + Owins;
+        }
+    }
 });
